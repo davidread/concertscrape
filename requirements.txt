@@ -1,0 +1,5 @@
+requests
+bs4
+pydantic
+gspread_pandas
+pandas
