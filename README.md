@@ -26,5 +26,5 @@ For uploading results to the Google Sheets, setup and download the Google Servic
 
 ```
 . venv/bin/activate
-python3 scrape.py
+python musicatoxford/mao.py
 ```
