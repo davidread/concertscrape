@@ -1,5 +1,5 @@
-from maoconcert import extract_concert
-from concert_schema import ProgrammeItem, Performer
+from .maoconcert import extract_concert
+from common.concert_schema import ProgrammeItem, Performer
 
 import datetime
 import unittest

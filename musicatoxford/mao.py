@@ -1,7 +1,7 @@
-from maoconcert import extract_concert, print_concert, print_concert_scrape
-from concert_schema import Concert, Performer, ProgrammeItem, ConcertScrape
-from concert_sheet import SheetHandler
-from stats import ScrapingStats, ScrapeResult
+from .maoconcert import extract_concert, print_concert, print_concert_scrape
+from common.concert_schema import Concert, Performer, ProgrammeItem, ConcertScrape
+from common.concert_sheet import SheetHandler
+from common.stats import ScrapingStats, ScrapeResult
 
 from datetime import datetime
 import logging
@@ -102,7 +102,7 @@ requests_session = RateLimitedRequestsSession(rate_limit_enabled=not os.environ.
 stats = ScrapingStats()
 stats_add_concert = lambda result: stats.add_concert('musicatoxford.com', result)
 
-if __name__ == "__main__":
+def scrape():
     sheet_handler = SheetHandler()
     scraper = ConcertScraper(sheet_handler)
 
@@ -112,3 +112,7 @@ if __name__ == "__main__":
     
     scraper.process_concerts(sitemap_content)
     stats.print_summary()
+    
+
+if __name__ == "__main__":
+    scrape()
