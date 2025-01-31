@@ -1,4 +1,4 @@
-from concert_schema import Concert, Performer, ProgrammeItem
+from common.concert_schema import Concert, Performer, ProgrammeItem
 
 from bs4 import BeautifulSoup
 import re
