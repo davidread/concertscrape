@@ -11,6 +11,7 @@ python3 -m venv venv
 . venv/bin/activate
 pip install --upgrade pip
 pip install -r requirements.txt
+pip install -e .
 ```
 
 For uploading results to the Google Sheets, setup and download the Google Service Account token, that has permission to write to the sheet:
@@ -26,5 +27,12 @@ For uploading results to the Google Sheets, setup and download the Google Servic
 
 ```
 . venv/bin/activate
-python musicatoxford/mao.py
+python concertscrape/musicatoxford/mao.py
+```
+
+## Tests
+
+```sh
+. venv/bin/activate
+python concertscrape/musicatoxford/test.py
 ```

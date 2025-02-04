@@ -1,7 +1,7 @@
-from .maoconcert import extract_concert, print_concert, print_concert_scrape
-from common.concert_schema import Concert, Performer, ProgrammeItem, ConcertScrape
-from common.concert_sheet import SheetHandler
-from common.stats import ScrapingStats, ScrapeResult
+from maoconcert import extract_concert, print_concert, print_concert_scrape
+from concertscrape.common.concert_schema import Concert, Performer, ProgrammeItem, ConcertScrape
+from concertscrape.common.concert_sheet import SheetHandler
+from concertscrape.common.stats import ScrapingStats, ScrapeResult
 
 from datetime import datetime
 import logging

@@ -1,7 +1,6 @@
-from common.concert_schema import Concert, Performer, ProgrammeItem
+from concertscrape.common.concert_schema import Concert, Performer, ProgrammeItem
 
 from bs4 import BeautifulSoup
-import re
 from datetime import datetime
 
 
