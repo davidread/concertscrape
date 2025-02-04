@@ -1,30 +1,35 @@
-from maoconcert import extract_concert
+from oxfordphilconcert import extract_concert
 from concertscrape.common.concert_schema import Concert, Performer, ProgrammeItem, ConcertScrape, print_concert_scrape
 from concertscrape.common.concert_sheet import SheetHandler
 from concertscrape.common.stats import ScrapingStats, ScrapeResult
 from concertscrape.common.requests_session import RateLimitedRequestsSession, REQUESTS_HEADERS
-
 from datetime import datetime
 import logging
 import os
 import xml.etree.ElementTree as ET
 
-
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-            
-class ConcertScraper:
+class OxfordPhilConcertScraper:
     def __init__(self, sheet_handler):
         self.sheet_handler = sheet_handler
 
     def parse_sitemap(self, sitemap_content):
         root = ET.fromstring(sitemap_content)
         concerts = []
+        
+        # Remove the XML stylesheet processing instruction if present
+        if sitemap_content.startswith('<?xml'):
+            clean_content = sitemap_content[sitemap_content.find('<urlset'):]
+            root = ET.fromstring(clean_content)
+
         for url in root.findall('.//{http://www.sitemaps.org/schemas/sitemap/0.9}url'):
             loc = url.find('{http://www.sitemaps.org/schemas/sitemap/0.9}loc').text
             lastmod = url.find('{http://www.sitemaps.org/schemas/sitemap/0.9}lastmod').text
-            if '/whats-on/' in loc and loc != 'https://www.musicatoxford.com/whats-on/':
+            
+            # Only process event URLs
+            if '/event/' in loc:
                 concerts.append({
                     'url': loc,
                     'lastmod': datetime.strptime(lastmod, '%Y-%m-%dT%H:%M:%S%z')
@@ -41,10 +46,10 @@ class ConcertScraper:
     def scrape_concert(self, url, last_modified):
         response = requests_session.get(url, headers=REQUESTS_HEADERS)
         if response.status_code == 404:
-            # this sometimes happens
-            return
+            logger.warning(f"Concert page not found: {url}")
+            return None
+            
         response.raise_for_status()
-
         concert = extract_concert(response.text)
         concert_scrape = ConcertScrape(
             scrape_date=datetime.now(),
@@ -52,7 +57,6 @@ class ConcertScraper:
             last_modified=last_modified,
             concert=concert,
         )
-        print_concert_scrape(concert_scrape)
         return concert_scrape
 
     def process_concerts(self, sitemap_content):
@@ -64,9 +68,10 @@ class ConcertScraper:
                 try:
                     concert_scrape = self.scrape_concert(concert['url'], concert['lastmod'])
                 except Exception as e:
-                    print(f"Error scraping concert {concert['url']}: {e}")
+                    logger.error(f"Error scraping concert {concert['url']}: {e}")
                     stats_add_concert(ScrapeResult.ERROR)
                     continue
+
                 if not concert_scrape:
                     continue
 
@@ -76,22 +81,26 @@ class ConcertScraper:
             else:
                 stats_add_concert(ScrapeResult.EXISTING)
 
+requests_session = RateLimitedRequestsSession(
+    rate_limit_enabled=not os.environ.get("DISABLE_RATELIMITING")
+)
 
-requests_session = RateLimitedRequestsSession(rate_limit_enabled=not os.environ.get("DISABLE_RATELIMITING"))
 stats = ScrapingStats()
-stats_add_concert = lambda result: stats.add_concert('musicatoxford.com', result)
+stats_add_concert = lambda result: stats.add_concert('oxfordphil.com', result)
 
 def scrape():
     sheet_handler = SheetHandler()
-    scraper = ConcertScraper(sheet_handler)
-
-    response = requests_session.get("https://www.musicatoxford.com/whats-on-sitemap.xml", headers=REQUESTS_HEADERS)
+    scraper = OxfordPhilConcertScraper(sheet_handler)
+    
+    response = requests_session.get(
+        "https://oxfordphil.com/event-sitemap.xml", 
+        headers=REQUESTS_HEADERS
+    )
     response.raise_for_status()
     sitemap_content = response.text
     
     scraper.process_concerts(sitemap_content)
     stats.print_summary()
-    
 
 if __name__ == "__main__":
     scrape()

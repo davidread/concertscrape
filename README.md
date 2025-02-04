@@ -35,4 +35,6 @@ python concertscrape/musicatoxford/mao.py
 ```sh
 . venv/bin/activate
 python concertscrape/musicatoxford/test.py
+python concertscrape/oxfordphil/test.py
+python concertscrape/oxfordphil/test_oxfordphilconcert.py
 ```

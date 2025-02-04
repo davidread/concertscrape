@@ -96,29 +96,3 @@ def extract_concert(html_content: str) -> Concert:
         concert_data['description'] = '\n'.join(paragraphs)
     
     return Concert(**concert_data)
-
-# Function to print the extracted data in a readable format
-def print_concert(concert):
-    print(f"Title: {concert.title}")
-    print(f"Date: {concert.date_parsed.strftime('%Y-%m-%d') or concert.date}")
-    print(f"Time: {concert.start_time} - {concert.end_time}")
-    print(f"Venue: {concert.venue}")
-    print(f"Address: {concert.venue_address}")
-    print(f"Tickets: {concert.ticket_prices}\n")
-    
-    print("Performers:")
-    for performer in concert.performers:
-        print(f"- {performer.role}: {performer.name}")
-    
-    print("\nProgramme:")
-    for item in concert.programme:
-        print(f"- {item.composer}: {item.piece}")
-    
-    print("\nDescription:")
-    print(concert.description)
-
-def print_concert_scrape(concert_scrape):
-    print(f"URL: {concert_scrape.url}")
-    print(f"Last modified: {concert_scrape.url}")
-    print(f"Concert:")
-    print_concert(concert_scrape.concert)
