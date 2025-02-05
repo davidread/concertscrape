@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from typing import List, Optional
 import datetime
 
@@ -23,8 +23,8 @@ class Concert(BaseModel):
     programme: List[ProgrammeItem] = Field(default_factory=list)
     description: Optional[str] = None
 
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "title": "International Organ Series: Bob Keys",
                 "date": "2021-05-15T00:00:00",
@@ -35,6 +35,7 @@ class Concert(BaseModel):
                 ]
             }
         }
+    )
 
 class ConcertScrape(BaseModel):
     url: str
