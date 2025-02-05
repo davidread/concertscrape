@@ -22,8 +22,10 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
+        pip install -e .
 
     - name: Run tests
       run: |
-        python musicatoxford/test.py -v
-        
+        python concertscrape/musicatoxford/test.py -v &&
+        python concertscrape/oxfordphil/test.py -v &&
+        python concertscrape/oxfordphil/test_oxfordphilconcert.py -v
