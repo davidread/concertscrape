@@ -10,7 +10,7 @@ These tools search for and scrape concerts. It saves the resulting concerts:
 python3 -m venv venv
 . venv/bin/activate
 pip install --upgrade pip
-pip install -r requirements.txt
+pip install -r requirements-dev.txt
 pip install -e .
 ```
 
@@ -34,7 +34,5 @@ python concertscrape/musicatoxford/mao.py
 
 ```sh
 . venv/bin/activate
-python concertscrape/musicatoxford/test.py
-python concertscrape/oxfordphil/test.py
-python concertscrape/oxfordphil/test_oxfordphilconcert.py
+pytest
 ```
