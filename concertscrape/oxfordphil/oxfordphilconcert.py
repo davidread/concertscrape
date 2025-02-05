@@ -25,7 +25,7 @@ def extract_program_and_performers_and_description(desc_elem: Tag):
     performers = []
     description_lines = []
     
-    paras = desc_elem.findAll('p')
+    paras = desc_elem.find_all('p')
     for para in paras:
 
         # Split into blocks based on double <br> tags
