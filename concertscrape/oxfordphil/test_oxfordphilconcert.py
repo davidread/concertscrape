@@ -1,6 +1,6 @@
 import pytest
 from datetime import datetime, date
-from oxfordphilconcert import extract_concert, clean_text, parse_date_and_time
+from concertscrape.oxfordphil.oxfordphilconcert import extract_concert, clean_text, parse_date_and_time
 from concertscrape.common.concert_schema import Concert, ProgrammeItem, Performer
 
 @pytest.mark.parametrize("input_text,expected", [

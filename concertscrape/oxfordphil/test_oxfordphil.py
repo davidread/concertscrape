@@ -1,5 +1,5 @@
 import pytest
-from oxfordphil import OxfordPhilConcertScraper, Concert, Performer, ProgrammeItem
+from concertscrape.oxfordphil.oxfordphil import OxfordPhilConcertScraper, Concert, Performer, ProgrammeItem
 from concertscrape.common.concert_sheet import SheetHandler
 from datetime import datetime, timezone
 import pandas as pd
