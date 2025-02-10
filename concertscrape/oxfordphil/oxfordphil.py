@@ -1,8 +1,10 @@
-from oxfordphilconcert import extract_concert
+from concertscrape.oxfordphil.oxfordphilconcert import extract_concert
 from concertscrape.common.concert_schema import Concert, Performer, ProgrammeItem, ConcertScrape, print_concert_scrape
 from concertscrape.common.concert_sheet import SheetHandler
 from concertscrape.common.stats import ScrapingStats, ScrapeResult
 from concertscrape.common.requests_session import RateLimitedRequestsSession, REQUESTS_HEADERS
+
+import argparse
 from datetime import datetime
 import logging
 import os
@@ -41,7 +43,7 @@ class OxfordPhilConcertScraper:
             if row.url == concert_url:
                 sheet_lastmod = datetime.strptime(row['last_modified'], '%Y-%m-%dT%H:%M:%S%z')
                 return lastmod > sheet_lastmod
-        return True
+        return 'new'
 
     def scrape_concert(self, url, last_modified):
         response = requests_session.get(url, headers=REQUESTS_HEADERS)
@@ -59,12 +61,13 @@ class OxfordPhilConcertScraper:
         )
         return concert_scrape
 
-    def process_concerts(self, sitemap_content):
+    def process_concerts(self, sitemap_content, dry_run):
         concerts = self.parse_sitemap(sitemap_content)
         sheet_data = self.sheet_handler.get_all_data()
         
         for concert in concerts:
-            if self.needs_update(concert['url'], concert['lastmod'], sheet_data):
+            needs_update = self.needs_update(concert['url'], concert['lastmod'], sheet_data)
+            if needs_update in (True, 'new'):
                 try:
                     concert_scrape = self.scrape_concert(concert['url'], concert['lastmod'])
                 except Exception as e:
@@ -75,10 +78,15 @@ class OxfordPhilConcertScraper:
                 if not concert_scrape:
                     continue
 
-                self.sheet_handler.update_concert(concert_scrape)
-                logger.info(f"Updated concert: {concert['url']}")
-                stats_add_concert(ScrapeResult.NEW)
+                self.sheet_handler.update_concert(concert_scrape, dry_run)
+                if needs_update == 'new':
+                    logger.info(f"New concert: {concert['url']}")
+                    stats_add_concert(ScrapeResult.NEW)
+                else:
+                    logger.info(f"Updated concert: {concert['url']}")
+                    stats_add_concert(ScrapeResult.UPDATED)
             else:
+                logger.info(f"Existing unchanged concert: {concert['url']}")
                 stats_add_concert(ScrapeResult.EXISTING)
 
 requests_session = RateLimitedRequestsSession(
@@ -88,7 +96,8 @@ requests_session = RateLimitedRequestsSession(
 stats = ScrapingStats()
 stats_add_concert = lambda result: stats.add_concert('oxfordphil.com', result)
 
-def scrape():
+
+def scrape(dry_run=False):
     sheet_handler = SheetHandler()
     scraper = OxfordPhilConcertScraper(sheet_handler)
     
@@ -99,8 +108,15 @@ def scrape():
     response.raise_for_status()
     sitemap_content = response.text
     
-    scraper.process_concerts(sitemap_content)
+    scraper.process_concerts(sitemap_content, dry_run=dry_run)
     stats.print_summary()
 
+def parse_arguments():
+    parser = argparse.ArgumentParser(description='Concert scraping script with command line options')
+    parser.add_argument('--dry-run', action='store_true', 
+                       help="Don't change the spreadsheet")
+    return parser.parse_args()
+
 if __name__ == "__main__":
-    scrape()
+    args = parse_arguments()
+    scrape(dry_run=args.dry_run)

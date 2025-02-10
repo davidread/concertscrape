@@ -1,4 +1,4 @@
-from maoconcert import extract_concert
+from concertscrape.musicatoxford.maoconcert import extract_concert
 from concertscrape.common.concert_schema import Concert, Performer, ProgrammeItem, ConcertScrape, print_concert_scrape
 from concertscrape.common.concert_sheet import SheetHandler
 from concertscrape.common.stats import ScrapingStats, ScrapeResult
@@ -52,7 +52,7 @@ class ConcertScraper:
             last_modified=last_modified,
             concert=concert,
         )
-        print_concert_scrape(concert_scrape)
+        # print_concert_scrape(concert_scrape)
         return concert_scrape
 
     def process_concerts(self, sitemap_content):

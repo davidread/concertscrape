@@ -44,7 +44,7 @@ class SheetHandler:
             print(f"ERROR reading sheet: {e}")
             return pd.DataFrame()
 
-    def update_concert(self, concert_scrape):
+    def update_concert(self, concert_scrape, dry_run=False):
         try:
             # Convert Concert model to dict
             concert_dict = concert_scrape.model_dump(mode='json') | concert_scrape.concert.model_dump(mode='json')
@@ -67,7 +67,8 @@ class SheetHandler:
                 df = pd.concat([df, new_df], ignore_index=True)
             
             # Write back to sheet
-            self.spread.df_to_sheet(df, index=False, replace=True)
+            if not dry_run:
+                self.spread.df_to_sheet(df, index=False, replace=True)
             
         except Exception as e:
             print(f"ERROR updating sheet: {e}")
