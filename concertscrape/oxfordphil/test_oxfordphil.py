@@ -54,7 +54,7 @@ def test_parse_sitemap(scraper, sitemap_content):
     # Test newer modification date
     ('2024-01-02T12:00:00+00:00', 'https://oxfordphil.com/event/test-concert/', True),
     # Test non-existent concert
-    ('2024-01-02T12:00:00+00:00', 'https://oxfordphil.com/event/new-concert/', True),
+    ('2024-01-02T12:00:00+00:00', 'https://oxfordphil.com/event/new-concert/', 'new'),
 ])
 def test_needs_update(scraper, mock_sheet_data, test_date, url, expected):
     """Test the needs_update logic"""
